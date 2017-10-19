@@ -1,0 +1,22 @@
+{
+  "dependencies": {
+    "mobius-js": "^0.1.0"
+  },
+  "scripts": {
+    "start": "mobius"
+  },
+  "main": "app.tsx",
+  "name": "mobius-sample",
+  "version": "0.1.0",
+  "description": "Sample project for mobius-js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/rpetrich/mobius-sample.git"
+  },
+  "author": "Ryan Petrich <rpetrich@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/rpetrich/mobius-sample/issues"
+  },
+  "homepage": "https://github.com/rpetrich/mobius-sample#readme"
+}
