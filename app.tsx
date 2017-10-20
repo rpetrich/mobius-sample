@@ -52,7 +52,7 @@ class RandomWidget extends dom.Component<{}, { value: string }> {
 
 class TextField extends dom.Component<{ value: string, placeholder?: string, onChange: (value: string) => void, onEnter: () => void }, { value: string }> {
 	onChange(event: any) {
-		this.props.onChange(event.value as string);
+		this.props.onChange(typeof event.value === "string" ? event.value : "");
 	}
 	onKeyPress(event: any) {
 		if (event.keyCode == 13 && this.props.onEnter) {
