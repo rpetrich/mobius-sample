@@ -153,15 +153,18 @@ class NewItemWidget extends dom.Component<{}, { value: string }> {
 	onChange(value: string) {
 		this.setState({ value });
 	}
-	send() {
-		sql.modify(database, "INSERT INTO mobius_todo.items (text) VALUES (?)", [this.state.value]).then(result => {
+	async send() {
+		try {
+			const result = await sql.modify(database, "INSERT INTO mobius_todo.items (text) VALUES (?)", [this.state.value]);
 			const message: DbRecordChange<Item> = {
 				operation: "create",
 				record: { id: result.insertId as number, text: this.state.value }
 			};
 			send(itemChanges, message);
 			this.setState({ value: "" });
-		}).catch(e => console.log(e));
+		} catch (e) {
+			console.log(e);
+		}
 	}
 }
 
@@ -182,27 +185,29 @@ class ItemWidget extends dom.Component<{ item: Item }, { pendingText: string | u
 	setPendingText(pendingText: string) {
 		this.setState({ pendingText : pendingText != this.props.item.text ? pendingText : undefined })
 	}
-	save() {
+	async save() {
 		if (typeof this.state.pendingText != "undefined") {
-			this.setState({ inProgress: true });
-			sql.modify(database, "UPDATE mobius_todo.items SET text = ? WHERE id = ?", [this.state.pendingText, this.props.item.id]).then(result => {
+			try {
+				this.setState({ inProgress: true });
+				await sql.modify(database, "UPDATE mobius_todo.items SET text = ? WHERE id = ?", [this.state.pendingText, this.props.item.id]);
 				send(itemChanges, {
 					operation: "modify",
 					record: { id: this.props.item.id, text: this.state.pendingText }
 				} as DbRecordChange<Item>);
 				this.setState({ pendingText: undefined, inProgress: false });
-			}).catch(e => console.log(e));
+			} catch (e) {
+				console.log(e);
+			}
 		}
 	}
-	delete() {
+	async delete() {
 		this.setState({ inProgress: true });
-		sql.modify(database, "DELETE FROM mobius_todo.items WHERE id = ?", [this.props.item.id]).then(result => {
-			send(itemChanges, {
-				operation: "delete",
-				record: this.props.item
-			} as DbRecordChange<Item>);
-			this.setState({ inProgress: false });
-		});
+		await sql.modify(database, "DELETE FROM mobius_todo.items WHERE id = ?", [this.props.item.id]);
+		send(itemChanges, {
+			operation: "delete",
+			record: this.props.item
+		} as DbRecordChange<Item>);
+		this.setState({ inProgress: false });
 	}
 }
 
@@ -210,19 +215,21 @@ class ItemsWidget extends dom.Component<{}, { items: Item[], message: string | u
 	constructor(props: any, context: any) {
 		super(props, context);
 		this.state = { items: [], message: "Loading..." };
-		sql.query(database, "SELECT id, text FROM mobius_todo.items ORDER BY id DESC", [], record => record as Item).then(
-			items => this.setState({ items, message: undefined }),
-			e => this.setState({ message: e.toString() })
-		);
 	}
 	render() {
 		return <div>{typeof this.state.message != "undefined" ? this.state.message : this.state.items.map(item => <ItemWidget item={item} key={item.id}/>)}</div>;
 	}
 	receiveChannel?: Channel;
-	componentWillMount() {
+	async componentWillMount() {
 		this.receiveChannel = receive(itemChanges, change => {
 			this.setState({ items: updatedRecordsFromChange(this.state.items, change) });
 		});
+		try {
+			const items = await sql.query(database, "SELECT id, text FROM mobius_todo.items ORDER BY id DESC", [], record => record as Item);
+			this.setState({ items, message: undefined });
+		} catch (e) {
+			this.setState({ message: e.toString() });
+		}
 	}
 	componentWillUnmount() {
 		if (this.receiveChannel) {
@@ -232,9 +239,12 @@ class ItemsWidget extends dom.Component<{}, { items: Item[], message: string | u
 }
 
 class SharingWidget extends dom.Component<{}, { url?: string, error?: any }> {
-	constructor(props: any, context: any) {
-		super(props, context);
-		shareSession().then(url => this.setState({ url })).catch(error => this.setState({ error }));
+	async componentWillMount() {
+		try {
+			this.setState({ url: await shareSession() });
+		} catch (error) {
+			this.setState({ error });
+		}
 	}
 	render() {
 		if (this.state.error) {
