@@ -1,7 +1,7 @@
 import * as dom from "dom";
 import { shareSession } from "mobius";
 
-export class SharingWidget extends dom.Component<{}, { url?: string, error?: any }> {
+export default class extends dom.Component<{}, { url?: string, error?: any }> {
 	async componentWillMount() {
 		try {
 			this.setState({ url: await shareSession() });

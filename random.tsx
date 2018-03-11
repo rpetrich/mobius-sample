@@ -1,6 +1,6 @@
 import * as dom from "dom";
 
-export class RandomWidget extends dom.Component<{}, { value: string }> {
+export default class extends dom.Component<{}, { value: string }> {
 	constructor(props: any, context: any) {
 		super(props, context);
 		console.log("Generating random numbers");

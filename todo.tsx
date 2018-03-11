@@ -77,7 +77,7 @@ class ItemWidget extends dom.Component<{ item: Item }, { pendingText: string | u
 	}
 	render() {
 		return (
-			<div>
+			<div key={this.props.item.id}>
 				<TextField value={typeof this.state.pendingText != "undefined" ? this.state.pendingText : this.props.item.text} onChange={this.setPendingText.bind(this)} onEnter={this.save.bind(this)}/>
 				<button onClick={this.save.bind(this)} class={typeof this.state.pendingText != "undefined" ? "save-dirty" : "save-clean"} disabled={this.state.inProgress}>Save</button>
 				<button onClick={this.delete.bind(this)} disabled={this.state.inProgress}>Delete</button>
@@ -119,7 +119,7 @@ class ItemsWidget extends dom.Component<{}, { items: Item[], message: string | u
 		this.state = { items: [], message: "Loading..." };
 	}
 	render() {
-		return <div>{typeof this.state.message != "undefined" ? this.state.message : this.state.items.map(item => <ItemWidget item={item} key={item.id}/>)}</div>;
+		return <div>{typeof this.state.message != "undefined" ? this.state.message : this.state.items.map(item => <ItemWidget item={item}/>)}</div>;
 	}
 	receiveChannel?: Channel;
 	async componentWillMount() {
@@ -140,7 +140,7 @@ class ItemsWidget extends dom.Component<{}, { items: Item[], message: string | u
 	}
 }
 
-export function ToDoWidget() {
+export default function() {
 	return <div>
 		<NewItemWidget/>
 		<ItemsWidget/>

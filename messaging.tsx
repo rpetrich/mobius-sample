@@ -33,18 +33,20 @@ class BroadcastWidget extends dom.Component<{}, { value: string }> {
 	render() {
 		return (
 			<div>
-				<TextField value={this.state.value} onChange={this.updateValue} onEnter={this.send}/>
-				<button onClick={this.send}>Send</button>
+				<TextField value={this.state.value} onChange={this.updateValue.bind(this)} onEnter={this.send.bind(this)}/>
+				<button onClick={this.send.bind(this)}>Send</button>
 			</div>
 		);
 	}
-	updateValue = (value: string) => this.setState({ value })
-	send = () => {
+	updateValue(value: string) {
+		this.setState({ value });
+	}
+	send() {
 		send(messagesTopic, this.state.value);
 	}
 }
 
-export function MessagingWidget() {
+export default function() {
 	return <div>
 		<BroadcastWidget/>
 		<ReceiveWidget/>
