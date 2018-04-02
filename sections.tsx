@@ -1,4 +1,5 @@
 import * as dom from "dom";
+import { activeSection, inactiveSection } from "./style.css";
 import { ErrorBoundary } from "./error";
 
 interface CollapsibleSectionProps {
@@ -25,14 +26,14 @@ export class CollapsibleSection extends dom.Component<CollapsibleSectionProps, {
 	render() {
 		if (this.state.visible) {
 			return <div>
-				<h2 class="active">
+				<h2 class={activeSection}>
 					<button onClick={() => this.setState({ visible: false })}>{this.props.title}</button>
 				</h2>
 				<ErrorBoundary>{this.state.contents || <div>{this.props.children}</div>}</ErrorBoundary>
 			</div>
 		} else {
 			return <div>
-				<h2 class="inactive">
+				<h2 class={inactiveSection}>
 					<button onClick={() => {
 						this.setState({ visible: true });
 						if (!this.state.contents && this.props.contents) {

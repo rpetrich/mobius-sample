@@ -70,9 +70,12 @@ h2 button:hover {
 	color: inherit;
 }
 
-h2.active button, h2.active button:hover {
+.activeSection button, .activeSection button:hover {
 	background: #76d100;
 	color: #fff;
+}
+
+.inactiveSection {
 }
 
 ::selection {
@@ -100,8 +103,11 @@ input:focus, textarea:focus {
 	border-color: #76d100;
 }
 
-.mobius-active .save-clean {
+:global(.mobius-active) .saveClean {
 	display: none;
+}
+
+.saveDirty {
 }
 
 .about {
@@ -117,6 +123,7 @@ input:focus, textarea:focus {
 	opacity: 0.66666;
 	display: inline-block;
 	transform-origin: center;
+	width: 13px;
 }
 
 .about:hover .heart {

@@ -4,6 +4,7 @@ import * as sql from "sql";
 import { secret } from "redact";
 import { topic, receive, send } from "broadcast";
 import { TextField } from "./form";
+import { saveDirty, saveClean } from "./style.css";
 
 const database = secret<sql.Credentials>("mysql", "localhost");
 
@@ -79,7 +80,7 @@ class ItemWidget extends dom.Component<{ item: Item }, { pendingText: string | u
 		return (
 			<div key={this.props.item.id}>
 				<TextField value={typeof this.state.pendingText != "undefined" ? this.state.pendingText : this.props.item.text} onChange={this.setPendingText.bind(this)} onEnter={this.save.bind(this)}/>
-				<button onClick={this.save.bind(this)} class={typeof this.state.pendingText != "undefined" ? "save-dirty" : "save-clean"} disabled={this.state.inProgress}>Save</button>
+				<button onClick={this.save.bind(this)} class={typeof this.state.pendingText != "undefined" ? saveDirty : saveClean} disabled={this.state.inProgress}>Save</button>
 				<button onClick={this.delete.bind(this)} disabled={this.state.inProgress}>Delete</button>
 			</div>
 		);
