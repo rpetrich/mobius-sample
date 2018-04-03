@@ -3,7 +3,7 @@
     "mobius-js": "^0.3.0"
   },
   "scripts": {
-    "start": "mobius"
+    "start": "mobius --launch"
   },
   "main": "app.tsx",
   "name": "mobius-sample",
