@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "mobius-js": "^0.3.0"
+    "mobius-js": "^0.4.0"
   },
   "scripts": {
     "start": "mobius --launch"
