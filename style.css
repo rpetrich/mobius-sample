@@ -123,7 +123,11 @@ input:focus, textarea:focus {
 	opacity: 0.66666;
 	display: inline-block;
 	transform-origin: center;
+	fill: red;
 	width: 13px;
+	margin: 0 1px;
+	position: relative;
+	top: 1px;
 }
 
 .about:hover .heart {
