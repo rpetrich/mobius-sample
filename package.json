@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "mobius-js": "^0.4.1",
-    "mysql": "^2.15.0"
+    "sqlite3": "^4.0.0"
   },
   "scripts": {
     "start": "mobius --launch"

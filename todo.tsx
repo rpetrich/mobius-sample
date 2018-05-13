@@ -1,13 +1,14 @@
-import { Channel, JsonMap } from "mobius-types";
+import { Channel } from "mobius-types";
 import * as dom from "dom";
 import { execute, sql } from "sql";
 import { db } from "secrets";
 import { topic, receive, send } from "broadcast";
 import { TextField } from "./form";
 import { saveDirty, saveClean } from "./style.css";
+import { Item as isItem } from "./todo!validators";
 
 type DbRecord = { id: number };
-type DbRecordChange<T extends DbRecord> = JsonMap & {
+type DbRecordChange<T extends DbRecord> = {
 	operation: "create" | "modify" | "delete";
 	record: T;
 };
@@ -35,7 +36,7 @@ function updatedRecordsFromChange<T extends DbRecord>(items: T[], message: DbRec
 	}
 }
 
-type Item = DbRecord & { text: string };
+export type Item = DbRecord & { text: string };
 const itemChanges = topic<DbRecordChange<Item>>("item-changes");
 
 class NewItemWidget extends dom.Component<{}, { value: string }> {
@@ -56,9 +57,9 @@ class NewItemWidget extends dom.Component<{}, { value: string }> {
 	}
 	async send() {
 		try {
-			await execute(db, sql`INSERT INTO mobius_todo.items (text) VALUES (${this.state.value})`);
+			await execute(db, sql`INSERT INTO items (text) VALUES (${this.state.value})`);
 			// Syntax to get the newly inserted row is different between MySQL and Postgres, using this fallback instead
-			const result = await execute(db, sql`SELECT MAX(id) as id FROM mobius_todo.items`);
+			const result = await execute(db, sql`SELECT MAX(id) as id FROM items`);
 			const message: DbRecordChange<Item> = {
 				operation: "create",
 				record: { id: result[0].id as number, text: this.state.value }
@@ -92,7 +93,7 @@ class ItemWidget extends dom.Component<{ item: Item }, { pendingText: string | u
 		if (typeof this.state.pendingText != "undefined") {
 			try {
 				this.setState({ inProgress: true });
-				await execute(db, sql`UPDATE mobius_todo.items SET text = ${this.state.pendingText} WHERE id = ${this.props.item.id}`);
+				await execute(db, sql`UPDATE items SET text = ${this.state.pendingText} WHERE id = ${this.props.item.id}`);
 				send(itemChanges, {
 					operation: "modify",
 					record: { id: this.props.item.id, text: this.state.pendingText }
@@ -105,7 +106,7 @@ class ItemWidget extends dom.Component<{ item: Item }, { pendingText: string | u
 	}
 	async delete() {
 		this.setState({ inProgress: true });
-		await execute(db, sql`DELETE FROM mobius_todo.items WHERE id = ${this.props.item.id}`);
+		await execute(db, sql`DELETE FROM items WHERE id = ${this.props.item.id}`);
 		send(itemChanges, {
 			operation: "delete",
 			record: this.props.item
@@ -128,7 +129,7 @@ class ItemsWidget extends dom.Component<{}, { items: Item[], message: string | u
 			this.setState({ items: updatedRecordsFromChange(this.state.items, change) });
 		});
 		try {
-			const items = await execute(db, sql`SELECT id, text FROM mobius_todo.items ORDER BY id DESC`, record => record as Item);
+			const items = await execute(db, sql`SELECT id, text FROM items ORDER BY id DESC`, isItem);
 			this.setState({ items, message: undefined });
 		} catch (e) {
 			this.setState({ message: e.toString() });
