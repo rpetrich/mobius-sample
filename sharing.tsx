@@ -1,10 +1,10 @@
 import * as dom from "dom";
-import { shareSession } from "mobius";
+import { share } from "peers";
 
 export default class extends dom.Component<{}, { url?: string, error?: any }> {
 	async componentWillMount() {
 		try {
-			this.setState({ url: await shareSession() });
+			this.setState({ url: await share() });
 		} catch (error) {
 			this.setState({ error });
 		}
