@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "mobius-js": "^0.4.1",
+    "mobius-js": "^0.6.0",
     "sqlite3": "^4.0.0"
   },
   "scripts": {
