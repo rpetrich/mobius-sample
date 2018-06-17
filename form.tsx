@@ -1,12 +1,12 @@
 import * as dom from "dom";
 
-export class TextField extends dom.Component<{ value: string, placeholder?: string, onChange: (value: string) => void, onEnter: () => void }, { value: string }> {
+export class TextField extends dom.Component<{ value: string, placeholder?: string, onChange: (value: string) => void | Promise<void>, onEnter: () => void | Promise<void> }, { value: string }> {
 	onChange(event: any) {
-		this.props.onChange(typeof event.value === "string" ? event.value : "");
+		return this.props.onChange(typeof event.value === "string" ? event.value : "");
 	}
 	onKeyPress(event: any) {
 		if (event.keyCode == 13 && this.props.onEnter) {
-			this.props.onEnter();
+			return this.props.onEnter();
 		}
 	}
 	render() {

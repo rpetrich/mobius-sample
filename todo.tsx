@@ -47,28 +47,24 @@ class NewItemWidget extends dom.Component<{}, { value: string }> {
 	render() {
 		return (
 			<div>
-				<TextField placeholder="New Item" value={this.state.value} onChange={this.onChange.bind(this)} onEnter={this.send.bind(this)} />
-				<button onClick={this.send.bind(this)}>Add</button>
+				<TextField placeholder="New Item" value={this.state.value} onChange={this.onChange.bind(this)} onEnter={this.addItem.bind(this)} />
+				<button onClick={this.addItem.bind(this)}>Add</button>
 			</div>
 		);
 	}
 	onChange(value: string) {
 		this.setState({ value });
 	}
-	async send() {
-		try {
-			await execute(db, sql`INSERT INTO items (text) VALUES (${this.state.value})`);
-			// Syntax to get the newly inserted row is different between MySQL and Postgres, using this fallback instead
-			const result = await execute(db, sql`SELECT MAX(id) as id FROM items`);
-			const message: DbRecordChange<Item> = {
-				operation: "create",
-				record: { id: result[0].id as number, text: this.state.value }
-			};
-			send(itemChanges, message);
-			this.setState({ value: "" });
-		} catch (e) {
-			console.log(e);
-		}
+	async addItem() {
+		await execute(db, sql`INSERT INTO items (text) VALUES (${this.state.value})`);
+		// Syntax to get the newly inserted row is different between MySQL and Postgres, using this fallback instead
+		const result = await execute(db, sql`SELECT MAX(id) as id FROM items`);
+		const message: DbRecordChange<Item> = {
+			operation: "create",
+			record: { id: result[0].id as number, text: this.state.value }
+		};
+		send(itemChanges, message);
+		this.setState({ value: "" });
 	}
 }
 
@@ -91,17 +87,13 @@ class ItemWidget extends dom.Component<{ item: Item }, { pendingText: string | u
 	}
 	async save() {
 		if (typeof this.state.pendingText != "undefined") {
-			try {
-				this.setState({ inProgress: true });
-				await execute(db, sql`UPDATE items SET text = ${this.state.pendingText} WHERE id = ${this.props.item.id}`);
-				send(itemChanges, {
-					operation: "modify",
-					record: { id: this.props.item.id, text: this.state.pendingText }
-				} as DbRecordChange<Item>);
-				this.setState({ pendingText: undefined, inProgress: false });
-			} catch (e) {
-				console.log(e);
-			}
+			this.setState({ inProgress: true });
+			await execute(db, sql`UPDATE items SET text = ${this.state.pendingText} WHERE id = ${this.props.item.id}`);
+			send(itemChanges, {
+				operation: "modify",
+				record: { id: this.props.item.id, text: this.state.pendingText }
+			} as DbRecordChange<Item>);
+			this.setState({ pendingText: undefined, inProgress: false });
 		}
 	}
 	async delete() {
@@ -128,12 +120,8 @@ class ItemsWidget extends dom.Component<{}, { items: Item[], message: string | u
 		this.receiveChannel = receive(itemChanges, change => {
 			this.setState({ items: updatedRecordsFromChange(this.state.items, change) });
 		});
-		try {
-			const items = await execute(db, sql`SELECT id, text FROM items ORDER BY id DESC`, isItem);
-			this.setState({ items, message: undefined });
-		} catch (e) {
-			this.setState({ message: e.toString() });
-		}
+		const items = await execute(db, sql`SELECT id, text FROM items ORDER BY id DESC`, isItem);
+		this.setState({ items, message: undefined });
 	}
 	componentWillUnmount() {
 		if (this.receiveChannel) {
