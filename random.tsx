@@ -1,10 +1,9 @@
 import * as dom from "dom";
 
 export default class extends dom.Component<{}, { value: string }> {
-	constructor(props: any, context: any) {
-		super(props, context);
+	state = { value: "" };
+	componentWillMount() {
 		console.log("Generating random numbers");
-		this.state = { value: "" };
 		this.updateRandom();
 	}
 	updateRandom = () => {

@@ -6,15 +6,14 @@ import { TextField } from "./form";
 const messagesTopic = topic<string>("messages");
 
 class ReceiveWidget extends dom.Component<{}, { messages: string[] }> {
-	constructor(props: any, context: any) {
-		super(props, context);
-		console.log("Receiving messages");
-		this.state = { messages: [] };
-	}
+	state = { messages: [] };
 	receiveChannel: Channel = receive(messagesTopic, value => {
 		console.log("Received: " + value);
 		this.setState({ messages: [value as string].concat(this.state.messages) });
 	});
+	componentWillMount() {
+		console.log("Receiving messages");
+	}
 	render() {
 		const messages = this.state.messages;
 		return <span>{messages.length > 0 ? messages.map(message => <div>{message}</div>) : "No Messages"}</span>;

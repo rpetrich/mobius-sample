@@ -40,10 +40,7 @@ export type Item = DbRecord & { text: string };
 const itemChanges = topic<DbRecordChange<Item>>("item-changes");
 
 class NewItemWidget extends dom.Component<{}, { value: string }> {
-	constructor(props: any, context: any) {
-		super(props, context);
-		this.state = { value: "" };
-	}
+	state = { value: "" };
 	render() {
 		return (
 			<div>
@@ -69,10 +66,7 @@ class NewItemWidget extends dom.Component<{}, { value: string }> {
 }
 
 class ItemWidget extends dom.Component<{ item: Item }, { pendingText: string | undefined, inProgress: boolean }> {
-	constructor(props: any, context: any) {
-		super(props, context);
-		this.state = { pendingText: undefined, inProgress: false };
-	}
+	state = { pendingText: undefined as string | undefined, inProgress: false };
 	render() {
 		return (
 			<div key={this.props.item.id}>
@@ -83,7 +77,7 @@ class ItemWidget extends dom.Component<{ item: Item }, { pendingText: string | u
 		);
 	}
 	setPendingText(pendingText: string) {
-		this.setState({ pendingText : pendingText != this.props.item.text ? pendingText : undefined })
+		this.setState({ pendingText: pendingText !== this.props.item.text ? pendingText : undefined })
 	}
 	async save() {
 		if (typeof this.state.pendingText != "undefined") {
@@ -108,10 +102,7 @@ class ItemWidget extends dom.Component<{ item: Item }, { pendingText: string | u
 }
 
 class ItemsWidget extends dom.Component<{}, { items: Item[], message: string | undefined }> {
-	constructor(props: any, context: any) {
-		super(props, context);
-		this.state = { items: [], message: "Loading..." };
-	}
+	state = { items: [], message: "Loading..." };
 	render() {
 		return <div>{typeof this.state.message != "undefined" ? this.state.message : this.state.items.map(item => <ItemWidget item={item}/>)}</div>;
 	}
